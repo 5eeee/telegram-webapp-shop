@@ -1,0 +1,32 @@
+body {
+  background: white;
+  font-family: 'Times New Roman', serif;
+  margin: 0;
+  padding: 20px;
+  color: #111;
+}
+.card {
+  border: 2px solid red;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+button {
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+button:hover {
+  background: darkred;
+}

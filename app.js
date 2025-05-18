@@ -1,89 +1,66 @@
-const tg=window.Telegram?window.Telegram.WebApp:null; // если запуск в Telegram
-const favKey='casher_favs';
+const tg = window.Telegram?window.Telegram.WebApp:null;
+const favKey='fav';
 let favorites=JSON.parse(localStorage.getItem(favKey)||'[]');
 
 function init(){
-  renderFilters();
+  fillFilterOptions();
   renderCatalog();
-  if(tg){tg.expand();}
-  document.getElementById('avatar').onclick=()=>alert('Профиль и история заказов в разработке');
+  if(tg) tg.expand();
+
+  document.getElementById('catFilter').onchange=renderCatalog;
+  document.getElementById('sizeFilter').onchange=renderCatalog;
+  document.getElementById('colorFilter').onchange=renderCatalog;
 }
 
-function renderFilters(){
-  const cats=[...new Set(products.map(p=>p.cat))];
-  const filters=document.getElementById('filters');
-  filters.innerHTML='';
-  ['Все',...cats].forEach(cat=>{
-    const chip=document.createElement('div');
-    chip.className='filter-chip';
-    chip.textContent=cat;
-    chip.onclick=()=>{
-      document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
-      chip.classList.add('active');
-      renderCatalog(cat==='Все'?null:cat);
-    };
-    filters.appendChild(chip);
-  });
-  filters.firstChild.classList.add('active');
+function fillFilterOptions(){
+  const catSel=document.getElementById('catFilter');
+  [...new Set(products.map(p=>p.cat))].forEach(c=>catSel.innerHTML+=`<option>${c}</option>`);
+
+  const sizeSel=document.getElementById('sizeFilter');
+  [...new Set(products.flatMap(p=>p.sizes))].forEach(s=>sizeSel.innerHTML+=`<option>${s}</option>`);
+
+  const colorSel=document.getElementById('colorFilter');
+  [...new Set(products.map(p=>p.color))].forEach(c=>colorSel.innerHTML+=`<option>${c}</option>`);
 }
 
-function renderCatalog(category=null){
+function renderCatalog(){
+  const cat=document.getElementById('catFilter').value;
+  const size=document.getElementById('sizeFilter').value;
+  const color=document.getElementById('colorFilter').value;
+
   const list=document.getElementById('catalog');
   list.innerHTML='';
-  products.filter(p=>!category||p.cat===category).forEach(p=>list.appendChild(card(p)));
+  products.filter(p=>
+    (!cat||p.cat===cat)&&(!size||p.sizes.includes(size))&&(!color||p.color===color)
+  ).forEach(p=>list.appendChild(card(p)));
 }
 
 function card(p){
   const div=document.createElement('div');
-  div.className='card';
-
-  // верх: изображение + сердечко
-  const imgWrap=document.createElement('div');
-  imgWrap.className='card-img';
-  imgWrap.innerHTML=`<img src="${p.img}" alt="${p.name}">`;
-  const heart=document.createElement('div');
-  heart.className='heart';
-  heart.innerHTML=favorites.includes(p.id)?'❤️':'🤍';
-  heart.onclick=(e)=>{e.stopPropagation();toggleFav(p.id,heart);} 
-  imgWrap.appendChild(heart);
-
-  // низ: детали
-  const details=document.createElement('div');
-  details.className='details';
-  details.innerHTML=`
-    <div class="name">${p.name}</div>
-    <div class="price-area">
-      <span class="price">${p.price} ₽</span>
-      <span class="old-price">${p.old} ₽</span>
+  div.className='product-card';
+  div.innerHTML=`<div class='product-image'><img src='${p.img}' alt='${p.name}'><div class='heart' onclick='toggleFav(event,${p.id})'>${favorites.includes(p.id)?'♥':'♡'}</div></div>
+  <div class='product-info'>
+    <h3>${p.name}</h3>
+    <p>${p.price} ₽</p>
+    <div class='buttons'>
+      <button class='details' onclick='openModal(event,${p.id})'>Подробнее</button>
+      <button class='add' onclick='addToCart(event)'>В корзину</button>
     </div>
-  `;
-  const btnGroup=document.createElement('div');
-  btnGroup.className='btns';
-  const more=document.createElement('button');
-  more.className='btn secondary';
-  more.textContent='Подробнее';
-  more.onclick=(e)=>{e.stopPropagation();openModal(p);} 
-  const cart=document.createElement('button');
-  cart.className='btn';
-  cart.textContent='В корзину';
-  cart.onclick=(e)=>{e.stopPropagation();alert('Добавлено в корзину');};
-  btnGroup.appendChild(more);
-  btnGroup.appendChild(cart);
-  details.appendChild(btnGroup);
-
-  div.appendChild(imgWrap);
-  div.appendChild(details);
+  </div>`;
   return div;
 }
 
-function toggleFav(id,heart){
+function toggleFav(e,id){
+  e.stopPropagation();
   const idx=favorites.indexOf(id);
-  if(idx>-1){favorites.splice(idx,1);heart.textContent='🤍';}
-  else {favorites.push(id);heart.textContent='❤️';}
+  if(idx>-1)favorites.splice(idx,1);else favorites.push(id);
   localStorage.setItem(favKey,JSON.stringify(favorites));
+  renderCatalog();
 }
 
-function openModal(p){
+function openModal(e,id){
+  e.stopPropagation();
+  const p=products.find(x=>x.id===id);
   document.getElementById('m-img').src=p.img;
   document.getElementById('m-name').textContent=p.name;
   document.getElementById('m-price').textContent=p.price;
@@ -103,7 +80,11 @@ function openModal(p){
   document.getElementById('modal').classList.remove('hidden');
 }
 
-function closeModal(){document.getElementById('modal').classList.add('hidden');}
-function addToCart(){alert('Товар добавлен в корзину');closeModal();}
+  document.getElementById('modal').classList.remove('hidden');
 
-document.addEventListener('DOMContentLoaded',init);
+function closeModal(){
+  document.getElementById('modal').classList.add('hidden');
+}
+
+// 👉 ВАЖНО: вызываем инициализацию
+init();

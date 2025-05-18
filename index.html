@@ -3,32 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Casher Shop</title>
+  <title>Devyatov Clothes</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <header class="topbar">
-    <div class="logo">Casher</div>
-    <div class="filters" id="filters"></div>
-    <div id="avatar" class="avatar" title="Профиль"></div>
-  </header>
+  <div class="avatar"><img src="avatar.png" alt="avatar" /></div>
+  <h1 class="shop-title">Devyatov Clothes</h1>
 
-  <main>
-    <!-- Каталог -->
-    <section id="catalog" class="grid"></section>
-  </main>
+  <!-- фильтры -->
+  <div class="filters">
+    <select id="catFilter"><option value="">Категория</option></select>
+    <select id="sizeFilter"><option value="">Размер</option></select>
+    <select id="colorFilter"><option value="">Цвет</option></select>
+    <select><option>Цена</option></select>
+    <select><option>Сезон</option></select>
+    <select><option>Материал</option></select>
+    <select><option>Новинки</option></select>
+    <select><option>Скидки</option></select>
+  </div>
 
-  <!-- Модалка товара -->
+  <div id="catalog" class="products"></div>
+
+  <!-- модалка -->
   <div id="modal" class="modal hidden">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">×</span>
       <img id="m-img" />
       <h2 id="m-name"></h2>
       <p class="m-price" id="m-price"></p>
-      <div class="sizes" id="size-list"></div>
+      <div id="size-list" class="sizes"></div>
       <p id="m-desc"></p>
-      <button class="btn" onclick="addToCart()">В корзину</button>
+      <button class="btn" onclick="addToCart()">Добавить в корзину</button>
     </div>
   </div>
 

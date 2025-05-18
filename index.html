@@ -1,19 +1,38 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Магазин одежды</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Casher Shop</title>
+  <link rel="stylesheet" href="styles.css" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <div id="root">
-    <h2>Добро пожаловать 👋</h2>
-    <div id="catalog"></div>
-    <h3>Личный кабинет</h3>
-    <ul id="favorites"></ul>
+  <header class="topbar">
+    <div class="logo">Casher</div>
+    <div class="filters" id="filters"></div>
+    <div id="avatar" class="avatar" title="Профиль"></div>
+  </header>
+
+  <main>
+    <!-- Каталог -->
+    <section id="catalog" class="grid"></section>
+  </main>
+
+  <!-- Модалка товара -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">×</span>
+      <img id="m-img" />
+      <h2 id="m-name"></h2>
+      <p class="m-price" id="m-price"></p>
+      <div class="sizes" id="size-list"></div>
+      <p id="m-desc"></p>
+      <button class="btn" onclick="addToCart()">В корзину</button>
+    </div>
   </div>
+
+  <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

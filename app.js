@@ -1,60 +1,109 @@
-const tg = window.Telegram.WebApp;
-tg.expand();
+const tg=window.Telegram?window.Telegram.WebApp:null; // если запуск в Telegram
+const favKey='casher_favs';
+let favorites=JSON.parse(localStorage.getItem(favKey)||'[]');
 
-const catalog = document.getElementById('catalog');
-const favoritesList = document.getElementById('favorites');
-const products = [
-  { id: 1, name: 'Красная куртка', price: 4990 },
-  { id: 2, name: 'Белая футболка', price: 1990 },
-  { id: 3, name: 'Черные джинсы', price: 3990 },
-  { id: 4, name: 'Серая толстовка', price: 2990 },
-  { id: 5, name: 'Кроссовки', price: 5990 },
-];
-
-let favorites = [];
-
-function renderCatalog() {
-  catalog.innerHTML = '';
-  products.forEach(product => {
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-      <h3>${product.name}</h3>
-      <p>Цена: ${product.price} ₽</p>
-      <button onclick="addToFavorites(${product.id})">❤️ В избранное</button>
-    `;
-    catalog.appendChild(div);
-  });
-}
-
-function addToFavorites(id) {
-  const product = products.find(p => p.id === id);
-  if (!favorites.find(f => f.id === id)) {
-    favorites.push(product);
-    renderFavorites();
-  }
-}
-
-function renderFavorites() {
-  favoritesList.innerHTML = '';
-  favorites.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = `${item.name} — ${item.price} ₽`;
-    favoritesList.appendChild(li);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+function init(){
+  renderFilters();
   renderCatalog();
-  renderFavorites();
+  if(tg){tg.expand();}
+  document.getElementById('avatar').onclick=()=>alert('Профиль и история заказов в разработке');
+}
 
-  tg.MainButton.setText('Оформить заказ');
-  tg.MainButton.show();
-
-  tg.MainButton.onClick(() => {
-    tg.sendData(JSON.stringify({
-      action: 'checkout',
-      favorites: favorites
-    }));
+function renderFilters(){
+  const cats=[...new Set(products.map(p=>p.cat))];
+  const filters=document.getElementById('filters');
+  filters.innerHTML='';
+  ['Все',...cats].forEach(cat=>{
+    const chip=document.createElement('div');
+    chip.className='filter-chip';
+    chip.textContent=cat;
+    chip.onclick=()=>{
+      document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      renderCatalog(cat==='Все'?null:cat);
+    };
+    filters.appendChild(chip);
   });
-});
+  filters.firstChild.classList.add('active');
+}
+
+function renderCatalog(category=null){
+  const list=document.getElementById('catalog');
+  list.innerHTML='';
+  products.filter(p=>!category||p.cat===category).forEach(p=>list.appendChild(card(p)));
+}
+
+function card(p){
+  const div=document.createElement('div');
+  div.className='card';
+
+  // верх: изображение + сердечко
+  const imgWrap=document.createElement('div');
+  imgWrap.className='card-img';
+  imgWrap.innerHTML=`<img src="${p.img}" alt="${p.name}">`;
+  const heart=document.createElement('div');
+  heart.className='heart';
+  heart.innerHTML=favorites.includes(p.id)?'❤️':'🤍';
+  heart.onclick=(e)=>{e.stopPropagation();toggleFav(p.id,heart);} 
+  imgWrap.appendChild(heart);
+
+  // низ: детали
+  const details=document.createElement('div');
+  details.className='details';
+  details.innerHTML=`
+    <div class="name">${p.name}</div>
+    <div class="price-area">
+      <span class="price">${p.price} ₽</span>
+      <span class="old-price">${p.old} ₽</span>
+    </div>
+  `;
+  const btnGroup=document.createElement('div');
+  btnGroup.className='btns';
+  const more=document.createElement('button');
+  more.className='btn secondary';
+  more.textContent='Подробнее';
+  more.onclick=(e)=>{e.stopPropagation();openModal(p);} 
+  const cart=document.createElement('button');
+  cart.className='btn';
+  cart.textContent='В корзину';
+  cart.onclick=(e)=>{e.stopPropagation();alert('Добавлено в корзину');};
+  btnGroup.appendChild(more);
+  btnGroup.appendChild(cart);
+  details.appendChild(btnGroup);
+
+  div.appendChild(imgWrap);
+  div.appendChild(details);
+  return div;
+}
+
+function toggleFav(id,heart){
+  const idx=favorites.indexOf(id);
+  if(idx>-1){favorites.splice(idx,1);heart.textContent='🤍';}
+  else {favorites.push(id);heart.textContent='❤️';}
+  localStorage.setItem(favKey,JSON.stringify(favorites));
+}
+
+function openModal(p){
+  document.getElementById('m-img').src=p.img;
+  document.getElementById('m-name').textContent=p.name;
+  document.getElementById('m-price').textContent=p.price;
+  document.getElementById('m-desc').textContent=p.desc;
+  const sizeWrap=document.getElementById('size-list');
+  sizeWrap.innerHTML='';
+  p.sizes.forEach(s=>{
+    const chip=document.createElement('div');
+    chip.className='size-chip';
+    chip.textContent=s;
+    chip.onclick=()=>{
+      sizeWrap.querySelectorAll('.size-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+    };
+    sizeWrap.appendChild(chip);
+  });
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+function addToCart(){alert('Товар добавлен в корзину');closeModal();}
+
+document.addEventListener('DOMContentLoaded',init);

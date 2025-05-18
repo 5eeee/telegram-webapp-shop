@@ -1,32 +1,53 @@
-body {
-  background: white;
-  font-family: 'Times New Roman', serif;
-  margin: 0;
-  padding: 20px;
-  color: #111;
+:root {
+  --red:#d32f2f;
+  --red-dark:#b71c1c;
+  --bg:#f7f7f7;
+  --radius:16px;
 }
-.card {
-  border: 2px solid red;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-}
-button {
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.3s ease;
-}
-button:hover {
-  background: darkred;
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{font-family:'Times New Roman',serif;background:var(--bg);}
+body{padding-bottom:60px;}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:white;box-shadow:0 2px 8px rgba(0,0,0,.06);position:sticky;top:0;z-index:10;border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius);} 
+.logo{font-size:24px;font-weight:bold;color:var(--red);} 
+.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;} 
+.filters::-webkit-scrollbar{display:none;} 
+.filter-chip{padding:6px 14px;border:1px solid var(--red);border-radius:999px;font-size:14px;cursor:pointer;white-space:nowrap;background:white;transition:.2s;}
+.filter-chip.active, .filter-chip:hover{background:var(--red);color:white;}
+
+.avatar{width:36px;height:36px;border-radius:50%;background:lightgray url('https://placekitten.com/100/100') center/cover;cursor:pointer;}
+
+/* Grid catalog */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;padding:20px;}
+
+/* Product card */
+.card{background:white;border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.08);display:flex;flex-direction:column;height:600px;}
+.card-img{position:relative;height:400px;}
+.card-img img{width:100%;height:100%;object-fit:cover;}
+.heart{position:absolute;top:12px;right:12px;font-size:24px;color:white;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.details{flex:1;padding:14px;display:flex;flex-direction:column;justify-content:space-between;}
+.name{font-size:16px;font-weight:bold;line-height:1.2;margin-bottom:8px;}
+.price-area{display:flex;justify-content:space-between;align-items:end;}
+.price{font-size:18px;font-weight:bold;color:var(--red);}
+.old-price{text-decoration:line-through;font-size:14px;color:#888;}
+.btns{display:flex;gap:8px;margin-top:12px;}
+.btn{flex:1;padding:10px 0;border:none;border-radius:10px;cursor:pointer;transition:.2s;background:var(--red);color:white;font-weight:bold;}
+.btn.secondary{background:transparent;border:2px solid var(--red);color:var(--red);}
+.btn:hover{background:var(--red-dark);color:#fff;}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;justify-content:center;align-items:center;z-index:100;}
+.hidden{display:none;}
+.modal-content{background:white;border-radius:var(--radius);max-width:90%;max-height:95%;overflow-y:auto;padding:20px;text-align:center;}
+.modal-content img{width:100%;max-width:350px;border-radius:var(--radius);}
+.modal-content .btn{margin-top:16px;width:100%;}
+.close{position:absolute;top:14px;right:20px;font-size:28px;cursor:pointer;}
+.sizes{display:flex;gap:8px;justify-content:center;margin:12px 0;}
+.size-chip{padding:6px 14px;border:1px solid var(--red);border-radius:999px;cursor:pointer;}
+.size-chip.active, .size-chip:hover{background:var(--red);color:white;}
+
+@media(max-width:600px){
+  .grid{gap:12px;padding:12px;}
+  .card{height:540px;}
 }
